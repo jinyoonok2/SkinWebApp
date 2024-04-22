@@ -125,6 +125,33 @@ const Main = () => {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [dict]);
+    
+    // image resize function
+    const resizeImage = (imageSrc, callback) => {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        const img = new Image();
+        img.onload = () => {
+            canvas.width = 256;
+            canvas.height = 256;
+            ctx.drawImage(img, 0, 0, 256, 256);
+            callback(canvas.toDataURL("image/jpeg"));
+        };
+        img.src = imageSrc;
+    };
+
+    // handle file change
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const url = URL.createObjectURL(file);
+            resizeImage(url, resizedImage => {
+                setImg(resizedImage);
+                URL.revokeObjectURL(url); // Clean up the blob URL
+            });
+        }
+    };
+    
 
 
     /* 
@@ -146,10 +173,17 @@ const Main = () => {
     /* 
     *   use getScreenShot() func to capture from webcam then setting image with useState
     */
+    // const capture = useCallback(() => {
+    //     const imageSrc = webcamRef.current.getScreenshot();
+    //     setImg(imageSrc);
+    // }, [webcamRef]);
     const capture = useCallback(() => {
         const imageSrc = webcamRef.current.getScreenshot();
-        setImg(imageSrc);
+        resizeImage(imageSrc, resizedImage => {
+            setImg(resizedImage);
+        });
     }, [webcamRef]);
+    
 
     const classbar = Object.entries(myDict).map(([key, value]) => (
         <div key={key} style={{ margin: "15px 0" }}>
@@ -246,7 +280,7 @@ const Main = () => {
                             startIcon={<CameraAlt />}
                         >Capture</Button>
                     )}
-                    <input
+                    {/* <input
                         type="file"
                         accept="image/*"
                         style={{ display: "none" }}
@@ -259,7 +293,15 @@ const Main = () => {
                             }
                         }}
                         ref={inputImageRef}
+                    /> */}
+                    <input
+                    type="file"
+                    accept="image/*"
+                    style={{ display: "none" }}
+                    onChange={handleFileChange}
+                    ref={inputImageRef}
                     />
+
                     <Button
                         variant="contained"
                         style={{ marginRight: "5px", width: '50%', height: "5rem" }}

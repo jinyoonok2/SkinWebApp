@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { styled, alpha } from '@mui/material/styles';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -21,6 +21,7 @@ import ListItemText from '@mui/material/ListItemText';
 import Info  from '@mui/icons-material/Info';
 import CameraAlt from '@mui/icons-material/CameraAlt';
 import { Help, Home } from '@mui/icons-material';
+import Button from '@mui/material/Button';
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -87,6 +88,26 @@ export default function SearchAppBar() {
     left: false,
   });
 
+  const [installPrompt, setInstallPrompt] = useState(null);
+  const [isInstallable, setIsInstallable] = useState(false);
+
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (e) => {
+      // Prevent the mini-infobar from appearing on mobile
+      e.preventDefault();
+      // Save the event for later use
+      setInstallPrompt(e);
+      // Update UI to show install button
+      setIsInstallable(true);
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    };
+  }, []);
+
   const toggleDrawer = (open) => (event) => {
     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
       return;
@@ -136,6 +157,25 @@ export default function SearchAppBar() {
     </Box>
   );
 
+  const handleInstallClick = async () => {
+    if (installPrompt) {
+      // Show the install prompt
+      installPrompt.prompt();
+      // Wait for the user to respond to the prompt
+      const { outcome } = await installPrompt.userChoice;
+      // Optionally, send analytics event with outcome of prompt
+      console.log(`User response to the install prompt: ${outcome}`);
+      // Clear the install prompt as it can't be used again
+      setInstallPrompt(null);
+      setIsInstallable(false);
+    } else {
+      // Alert the user that the app can't be installed at this moment
+      alert("The app can't be installed right now. Try again later.");
+    }
+  };
+  
+  
+
   return (
     <Box sx={{ flexGrow: 1 }}>
       {/* <AppBar position="static" color="success"> */}
@@ -169,47 +209,21 @@ export default function SearchAppBar() {
             onClick={handleMain}
           > PSU SCD APP</span>
           </Typography>
-          <Search>
-            <SearchIconWrapper>
-              <SearchIcon />
-            </SearchIconWrapper>
-            <Autocomplete
-              options={cancers}
-              value={selectedValue} 
-              onChange={(event, newValue) => {
-                if(newValue !== null) {
-                  setSearchTerm(newValue);
-                  setSelectedValue(newValue);
-                  setOpen(true); // Dialog 닫기
-                }
-                else {
-                  setSearchTerm(newValue);
-                  setSelectedValue(newValue);
-                }
-              }}
-              noOptionsText="There is no Result."
-              sx={{
-                '& .MuiAutocomplete-paper': {
-                  color: 'white', // Changes the text color of the dropdown options and noOptionsText
-                },
-                '& .MuiAutocomplete-noOptions': {
-                  color: 'white', // Specifically targets the noOptionsText color
-                },
-              }}
-              renderInput={(params) => {
-                const {InputLabelProps,InputProps,...rest} = params;
-                return (
-                  <StyledInputBase 
-                    {...params.InputProps} 
-                    {...rest}
-                    placeholder="Search Skin Cancer"               
-                    onChange={(e) => (setSearchTerm(e.target.value))}
-                    onKeyDown={handleSearch}
-                  />
-                );
-              }}
-            />
-          </Search>
+          <Button 
+            color="inherit"  // Maintains the text color inheritance, which we will override
+            onClick={handleInstallClick}
+            sx={{ 
+              marginLeft: 'auto', 
+              color: 'white',  // Sets the text color to white
+              backgroundColor: 'orange',  // Sets the background color to orange
+              '&:hover': {  // Styles for hover state
+                backgroundColor: 'darkorange'  // Darkens the orange on hover for a visual effect
+              }
+            }}
+          >
+            Install App
+          </Button>
+
         </Toolbar>
       </AppBar>
     </Box>
