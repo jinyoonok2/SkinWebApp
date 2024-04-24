@@ -18,15 +18,14 @@ const About = () => {
         <img className="background-image" src={ProjectBackground} alt="" />
       </div>
       <div className="project-section-text-container">
-        <p className="project-primary-subheading">Project</p>
         <h1 className="project-primary-heading">
-          Project Title
+          Enhanced Architecture with Advanced Image Processing and Integration of Feature Modules
         </h1>
         <p className="project-primary-text">
-          Project description will be added here1.
+          The Image Processing stage of the research successfully removes confounding factors from the skin lesion image data to correct model comprehension of the input and improve accuracy.
         </p>
         <p className="project-primary-text">
-          Project description will be added here2.
+          The Modular Modification stage of the research enhances the accuracy and generalization of model performance by integrating new feature modules, such as BiFPN, into the original YOLOv8 architecture.
         </p>
         <div className="project-buttons-container">
           <button className="secondary-button" onClick={handleClick}>Repository</button>

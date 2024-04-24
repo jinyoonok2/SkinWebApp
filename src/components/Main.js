@@ -27,7 +27,7 @@ const Main = () => {
     const [dict, setDict] = useState({});
     const [myDict, setMyDict] = useState({});
     const [settingVisible, setSettingVisible] = useState(false);
-    const [scoreThreshold, setScoreThreshold] = useState(0.35);
+    const [scoreThreshold, setScoreThreshold] = useState(0.5);
 
     // This is to add name & description
     const [cancerInfo, setCancerInfo] = useState({

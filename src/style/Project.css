@@ -11,7 +11,6 @@
     color: rgb(0, 0, 0);
     margin: 1.5rem 0rem;
     word-break:keep-all;
-    font-weight: bold;
   }
   
   .secondary-button {
@@ -131,8 +130,11 @@
     }
   
     .project-primary-text {
-      text-align: center;
-      max-width: 80%;
+      font-size: clamp(1rem, 3vw, 1.5rem);
+      max-width: 500px;
+      color: #ffffff;
+      margin: 1.5rem 0rem;
+      word-break: keep-all;
     }
   
     .project-section-text-container {
