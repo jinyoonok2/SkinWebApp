@@ -43,11 +43,6 @@ const Main = () => {
     useEffect(() => {
         const loadModel = async () => {
             try {
-                /*
-                *   Main 컴포넌트에서 json 파일 가져오기 위해 replace
-                *   만약 App.js에서 수행한다면 currentPath를 삭제하고
-                *   window.location.href로 설정
-                */
                 const currentPath = window.location.href.replace('/main', '');
                 const yolov8 = await tf.loadGraphModel(
                     `${currentPath}/${modelName}_web_model/model.json`,
@@ -58,15 +53,15 @@ const Main = () => {
                     }
                 );
                 /* 
-                *   tf.randomUniform를 사용하여 무작위 입력 텐서를 생성
-                *   더미 입력으로 모델 워밍업
+                *   tf.randomUniform, use random tensor input
+                *   warm up with dummy data
                 */
                 const dummyInput = tf.randomUniform(yolov8.inputs[0].shape, 0, 1, "float32");
                 const warmupResults = yolov8.execute(dummyInput);
                 setLoading({ loading: false, progress: 1 });
 
 
-                // 더미 입력은 워밍업을 통해 출력 형상을 알아내기 위함
+                // dummy input to get to know the form of print
                 setModel({
                     net: yolov8,
                     inputShape: yolov8.inputs[0].shape,
@@ -79,7 +74,7 @@ const Main = () => {
             }
         };
 
-        // 모델이 아직 로드되지 않았을 때 재귀로 모델을 로드
+        // model not loaded yet? load again.
         if (!model.net) {
             tf.ready().then(loadModel);
         }
@@ -87,15 +82,14 @@ const Main = () => {
 
 
     /*
-    *   detectFrame에서 하나의 프레임(이미지)에 대한 결과를 딕셔너리처럼 가져오고(dict)
-    *   이를 myDict에 저장 (스트림 실시간 탐지를 위해 함수 내부에서 dict 값을 가져옴)
-    *   useEffect를 통해 dict에 저장된 값을 사용해 myDict를 수정
+    * detectFrame take the result of the frame(image) as dict and save it to myDict
+    * useEffect correct myDict using the values saved in dict.
     */
 
     /*
-    *   하나의 이미지에서 탐지된 꽃들(key) 각각을 for문 
-    *   이미 label이 존재한다면 score 값을 확인해서 갱신하는 로직
-    *   현재 키가 myDict에 존재하지 않고 undefined 값이 아닐 경우 myDict에 갱신
+    *   use for loop for each of the flowers detected in one image. 
+    *   if label already exist, check score and update
+    *   if current key does not exist in myDict and not undefined, update to myDict
     */
     useEffect(() => {
         for (const key in dict) {
@@ -198,7 +192,7 @@ const Main = () => {
     ));
 
     const handleResetMyDict = () => {
-        setMyDict({}); // 초기화
+        setMyDict({}); // RESET
     };
 
     const handleClassBarClick = (key) => {
@@ -280,20 +274,6 @@ const Main = () => {
                             startIcon={<CameraAlt />}
                         >Capture</Button>
                     )}
-                    {/* <input
-                        type="file"
-                        accept="image/*"
-                        style={{ display: "none" }}
-                        onChange={(e) => {
-                            const selectedFile = e.target.files[0];
-                            if (selectedFile) {
-                                handleResetMyDict();
-                                const url = URL.createObjectURL(selectedFile); // Blob URL 생성
-                                setImg(url);
-                            }
-                        }}
-                        ref={inputImageRef}
-                    /> */}
                     <input
                     type="file"
                     accept="image/*"

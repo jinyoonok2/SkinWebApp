@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "../style/ClassBar.css";
 
 
-// 추론된 꽃(클래스)에 대한 percentage bar를 생성
+// create classbar for predicted class
 const ClassBar = (props) => {
   const { label, bgcolor, completed, onClick } = props;
   const [currentLabel, setCurrentLabel] = useState(label);
@@ -10,7 +10,7 @@ const ClassBar = (props) => {
   const [currentCompleted, setCurrentCompleted] = useState(completed);
 
   const handleClick = () => {
-    // 클릭 시, 전달받은 onClick 함수 호출
+    // on click, call onClick func
     onClick(label);
   };
 
@@ -23,8 +23,8 @@ const ClassBar = (props) => {
   const containerStyles = {
     marginBottom: "10px",
     width: '100%',
-    display: 'flex', // Flexbox 레이아웃 사용
-    alignItems: 'center', // 아이템을 수직 가운데로 정렬
+    display: 'flex',
+    alignItems: 'center',
     borderRadius: 20,
   };
 

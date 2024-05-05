@@ -116,9 +116,9 @@
   
   .buttons-wrapper {
     display: flex;
-    margin-top: 10px; /* 위쪽 간격 설정 */
-    margin-bottom: 10px; /* 위쪽 간격 설정 */
-    justify-content: center; /* 버튼들을 수평 가운데로 정렬하는 스타일 */
+    margin-top: 10px;
+    margin-bottom: 10px;
+    justify-content: center;
     align-items: center;
   }
   

@@ -31,7 +31,7 @@ function LinearProgressWithLabel(props) {
     );
 }
 
-// 0 ~ 100사이의 값으로 모델 로딩 진행 표시
+// express 0 to 100 model loading progress
 LinearProgressWithLabel.propTypes = {
   value: PropTypes.number.isRequired,
 };

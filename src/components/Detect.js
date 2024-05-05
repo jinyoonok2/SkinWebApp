@@ -7,13 +7,13 @@ const colors = new Colors();
 
 // Image preprocess before model detection
 const preprocess = (source, modelWidth, modelHeight) => {
-    let xRatio, yRatio; // 바운딩 박스 비율
+    let xRatio, yRatio; // BB ratio
 
     const input = tf.tidy(() => {
         const img = tf.browser.fromPixels(source);
 
-        // 이미지를 사각형으로 패딩 => [n, m] to [n, n], n > m
-        const [h, w] = img.shape.slice(0, 2); // 너비와 높이 추출
+        // image padding rect => [n, m] to [n, n], n > m
+        const [h, w] = img.shape.slice(0, 2); // extract height and width
         const maxSize = Math.max(w, h);
 
     // 이미지 크기가 모델의 입력 크기보다 크거나 같도록 확인
@@ -22,8 +22,8 @@ const preprocess = (source, modelWidth, modelHeight) => {
     }
 
         const imgPadded = img.pad([
-            [0, maxSize - h], // padding y [아래쪽으로만]
-            [0, maxSize - w], // padding x [오른쪽으로만]
+            [0, maxSize - h], // padding y [only downside]
+            [0, maxSize - w], // padding x [only to rightside]
             [0, 0],
         ]);
 
@@ -31,8 +31,8 @@ const preprocess = (source, modelWidth, modelHeight) => {
         yRatio = maxSize / h;
 
         return tf.image
-            .resizeBilinear(imgPadded, [modelWidth, modelHeight]) // 프레임 resize
-            .div(255.0) // 정규화
+            .resizeBilinear(imgPadded, [modelWidth, modelHeight]) // frame resize
+            .div(255.0) // normalization
             .expandDims(0); // add batch
     });
 
@@ -48,11 +48,11 @@ const detectFrame = async (source, model, canvasRef, setDict, callback = () => {
     // start scoping tf engine
     tf.engine().startScope();
 
-    const [input, xRatio, yRatio] = preprocess(source, modelWidth, modelHeight); // 이미지 전처리 (모델 크기에 맞게 이미지 리사이즈)
-    const res = model.net.execute(input); // 모델 실행
+    const [input, xRatio, yRatio] = preprocess(source, modelWidth, modelHeight); // image preprocess fit to model size
+    const res = model.net.execute(input); // model run
     const transRes = tf.tidy(() => res.transpose([0, 2, 1]).squeeze()); // transpose main result
 
-    //  바운딩 박스들 얻기 [y1, x1, y2, x2]
+    //  get bounding boxes [y1, x1, y2, x2]
     const boxes = tf.tidy(() => {
         const w = transRes.slice([0, 2], [-1, 1]);
         const h = transRes.slice([0, 3], [-1, 1]);
